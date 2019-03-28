@@ -54,8 +54,7 @@
         "required": true,
         "placeholder": "general",
         "order": 1,
-        "controlType": "textbox",
-        "isArray": true
+        "controlType": "textbox"
       },
       {
         "key": "color",

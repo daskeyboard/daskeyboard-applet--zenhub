@@ -1,0 +1,72 @@
+{
+  "name": "daskeyboard-applet--zenhub",
+  "displayName": "ZenHub",
+  "publisher": "Metadot Corporation",
+  "version": "1.0.6",
+  "officialProductName": "ZenHub",
+  "appUrl": "https://zenhub.com",
+  "description": "Get a notification when one of your site goes down.",
+  "longDescription": "Get ZenHub alerts directly on a Das Keyboard Q keyboard. Requires a ZenHub account.",
+  "icon": "assets/icon.png",
+  "image": "assets/image-missing.png",
+  "videoUrl": "",
+  "publisherName": "Das Keyboard",
+  "authorName": "Das Keyboard",
+  "authorUrl": "https://twitter.com/daskeyboard",
+  "issuesUrl": "https://github.com/daskeyboard/daskeyboard-applet--zenhub/issues",
+  "homePageUrl": "https://zenhub.com",
+  "developerRepoUrl": "https://github.com/daskeyboard/daskeyboard-applet--zenhub",
+  "licenseUrl": "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt",
+  "changelogUrl": "CHANGELOG.md",
+  "license": "MIT",
+  "readMeUrl": "README.md",
+  "readMeEndUserUrl": "README_ENDUSER.md",
+  "engines": {
+    "das-keyboard-q": "3.1.0"
+  },
+  "isSingleton": false,
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "watch": "nodemon .",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "daskeyboard-applet": "^2.10.13",
+    "request-promise": "^4.2.2"
+  },
+  "qConfig": {
+    "geometry": {
+      "width": 1,
+      "height": 1
+    },
+    "authorization": {
+      "type": "apiKey",
+      "hint": "Login or signup to get your API key",
+      "supportUrl": "https://app.zenhub.com/login"
+    },
+    "questions": [
+      {
+        "key": "color",
+        "label": "Choose the color of the reminder",
+        "help": "",
+        "required": true,
+        "order": 1,
+        "value": "#FFFF00",
+        "controlType": "color"
+      },
+      {
+        "key": "effect",
+        "label": "Choose the effect of the reminder",
+        "help": "",
+        "required": true,
+        "order": 2,
+        "value": "BLINK",
+        "controlType": "effect"
+      }
+    ]
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  }
+}

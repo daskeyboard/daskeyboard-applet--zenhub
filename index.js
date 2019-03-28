@@ -11,11 +11,13 @@ class ZenHub extends q.DesktopApp {
   constructor() {
     super();
     // run every 1 min
-    this.pollingInterval = 1*60*1000;
+    this.pollingInterval = 1 * 60 * 1000;
   }
+
 
   async applyConfig() {
     this.serviceHeaders = {
+      "Content-Type": "application/json",
       "X-Authentication-Token": this.authorization.apiKey,
     }
 
@@ -23,7 +25,7 @@ class ZenHub extends q.DesktopApp {
     this.categories = {};
 
     return request.get({
-      url: serviceUrl+this.config.reposId+'/board',
+      url: serviceUrl + this.config.reposId + '/board',
       headers: this.serviceHeaders,
       json: true
     }).then((body) => {
@@ -31,7 +33,7 @@ class ZenHub extends q.DesktopApp {
       // Get initial number of issues
       // logger.info("body "+ JSON.stringify(body));
       //
-      for(let pipeline of body.pipelines) {
+      for (let pipeline of body.pipelines) {
         // logger.info("pipeline "+ JSON.stringify(pipeline.issues));
         // logger.info("LENGTH "+ Object.keys(pipeline.issues).length);
 
@@ -46,57 +48,88 @@ class ZenHub extends q.DesktopApp {
       return null;
 
     })
-    .catch(error => {
-      logger.error(
-        `Got error sending request to service: ${JSON.stringify(error)}`);
-      return q.Signal.error([
-        'The ZenHub service returned an error. Please check your API key and account.',
-        `Detail: ${error.message}`]);
+      .catch(error => {
+        logger.error(
+          `Got error sending request to service: ${JSON.stringify(error)}`);
+        return q.Signal.error([
+          'The ZenHub service returned an error. Please check your API key and account.',
+          `Detail: ${error.message}`]);
+      });
+  }
+
+  // Test if it is possible to get the workspace name and projectID automaticaly with the API
+  // Instead of enter the field
+
+  /**
+  * Loads the list of workspace from the ZenHub API
+  */
+  async  loadRepos() {
+    logger.info(`Loading workspaces`);
+    const options = {
+      uri: `https://api.zenhub.io/v1/graphql`,
+      headers: this.serviceHeaders,
+      json: true
+    }
+
+    return request.get(options);
+  }
+
+  /**
+   * Called from the Das Keyboard Q software to retrieve the options to display for
+   * the user inputs
+   * @param {} fieldId 
+   * @param {*} search 
+   */
+  async options(fieldId, search) {
+    return this.loadRepos().then(body => {
+      return processReposResponse(body);
+    }).catch(error => {
+      logger.error(`Caught error when loading options: ${error}`);
     });
   }
 
   async run() {
     return request.get({
-        url: serviceUrl+this.config.reposId+'/board',
-        headers: this.serviceHeaders,
-        json: true
-      }).then((body) => {
-        let triggered = false;
-        let message = [];
-        let signal = null;
+      url: serviceUrl + this.config.reposId + '/board',
+      headers: this.serviceHeaders,
+      json: true
+    }).then((body) => {
+      let triggered = false;
+      let message = [];
+      let signal = null;
 
 
-        for (let pipeline of body.pipelines) {
+      for (let pipeline of body.pipelines) {
 
-          // logger.info(`pipeline in run(): ` + JSON.stringify(pipeline));
+        // logger.info(`pipeline in run(): ` + JSON.stringify(pipeline));
 
-          // Test if the number of issues is different
-          if(this.categories[pipeline.name]!=Object.keys(pipeline.issues).length){
-            // Numbers need to be the same
-            this.categories[pipeline.name]=Object.keys(pipeline.issues).length
-            // Need to send a signal
-            triggered = true;
-            // Update signal's message
-            message.push("Something happened on" + pipeline.name);
+        // Test if the number of issues is different
+        if (this.categories[pipeline.name] != Object.keys(pipeline.issues).length) {
+          // Numbers need to be the same
+          this.categories[pipeline.name] = Object.keys(pipeline.issues).length
+          // Need to send a signal
+          triggered = true;
+          // Update signal's message
+          message.push("Something happened on" + pipeline.name);
+        }
+
+      }
+
+      if (triggered) {
+        signal = new q.Signal({
+          points: [[new q.Point(this.config.color, this.config.effect)]],
+          name: "ZenHub",
+          message: message.join('<br>'),
+          link: {
+            url: 'https://www.zenhub.com/checkpoints',
+            label: 'Show in ZenHub',
           }
+        });
+      }
 
-        }
-         
-        if (triggered) {
-          signal = new q.Signal({ 
-            points:[[new q.Point(this.config.color,this.config.effect)]],
-            name: "ZenHub",
-            message: message.join('<br>'),
-            link: {
-              url: 'https://www.zenhub.com/checkpoints',
-              label: 'Show in ZenHub',
-            }
-          });
-        }
+      return signal;
 
-        return signal;
-
-      })
+    })
       .catch(error => {
         logger.error(
           `Got error sending request to service: ${JSON.stringify(error)}`);

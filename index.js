@@ -2,7 +2,7 @@ const q = require('daskeyboard-applet');
 const request = require('request-promise');
 const logger = q.logger;
 
-const serviceUrl = 'https://api.zenhub.io/';
+const serviceUrl = 'https://api.zenhub.io/p1/repositories/';
 
 // For further dev
 const serviceUrlEnterprise = 'https://<zenhub_enterprise_host>/'
@@ -16,62 +16,85 @@ class ZenHub extends q.DesktopApp {
 
   async applyConfig() {
     this.serviceHeaders = {
-      "Content-Type": "application/json",
       "X-Authentication-Token": this.authorization.apiKey,
     }
+
+    // Array to keep in mind the pipelines name.
+    this.categories = {};
+
+    return request.get({
+      url: serviceUrl+this.config.reposId+'/board',
+      headers: this.serviceHeaders,
+      json: true
+    }).then((body) => {
+
+      // Get initial number of issues
+      // logger.info("body "+ JSON.stringify(body));
+      //
+      for(let pipeline of body.pipelines) {
+        // logger.info("pipeline "+ JSON.stringify(pipeline.issues));
+        // logger.info("LENGTH "+ Object.keys(pipeline.issues).length);
+
+        // Add initial number of issues in an array
+        this.categories[pipeline.name] = Object.keys(pipeline.issues).length;
+
+        //logger.info("pipeline issues lenght ", pipeline.issues.lenght());
+      }
+
+      // logger.info("This is categories: " + JSON.stringify(this.categories));
+
+      return null;
+
+    })
+    .catch(error => {
+      logger.error(
+        `Got error sending request to service: ${JSON.stringify(error)}`);
+      return q.Signal.error([
+        'The ZenHub service returned an error. Please check your API key and account.',
+        `Detail: ${error.message}`]);
+    });
   }
 
   async run() {
     return request.get({
-        url: serviceUrl,
+        url: serviceUrl+this.config.reposId+'/board',
         headers: this.serviceHeaders,
         json: true
       }).then((body) => {
-        let color = '#00FF00';
         let triggered = false;
-        let alerts = [`ALARM `];
-        let effects = "SET_COLOR";
+        let message = [];
+        let signal = null;
 
-        for (let monitor of body) {
-          // extract the important values from the response
-          let status = monitor.status;
-          let monitorId = monitor.id;
 
-          logger.info(`For monitor ${monitorId}, got status: ${status}`);
+        for (let pipeline of body.pipelines) {
 
-          if (status === -1) {
+          // logger.info(`pipeline in run(): ` + JSON.stringify(pipeline));
+
+          // Test if the number of issues is different
+          if(this.categories[pipeline.name]!=Object.keys(pipeline.issues).length){
+            // Numbers need to be the same
+            this.categories[pipeline.name]=Object.keys(pipeline.issues).length
+            // Need to send a signal
             triggered = true;
-            color = '#FF0000';
-            effects="BLINK";
-            alerts.push(monitor.url + " is down!");
-            logger.info("Sending alert on " + monitor.url + " is down");
-          } 
-          
+            // Update signal's message
+            message.push("Something happened on" + pipeline.name);
+          }
+
         }
          
         if (triggered) {
-          let signal = new q.Signal({ 
-            points:[[new q.Point(color,effects)]],
+          signal = new q.Signal({ 
+            points:[[new q.Point(this.config.color,this.config.effect)]],
             name: "ZenHub",
-            message: alerts.join('<br>'),
+            message: message.join('<br>'),
             link: {
               url: 'https://www.zenhub.com/checkpoints',
               label: 'Show in ZenHub',
             }
           });
-          return signal;
-        } else {
-          let signal = new q.Signal({ 
-            points:[[new q.Point(color)]],
-            name: "ZenHub",
-            message: `Everything is OK.`,
-            link: {
-              url: 'https://www.zenhub.com',
-              label: 'Show in ZenHub',
-            }
-          });
-          return signal;
         }
+
+        return signal;
 
       })
       .catch(error => {

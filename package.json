@@ -42,10 +42,21 @@
     },
     "authorization": {
       "type": "apiKey",
-      "hint": "Login or signup to get your API key",
-      "supportUrl": "https://app.zenhub.com/login"
+      "hint": "Login or signup to get your API token",
+      "supportUrl": "https://app.zenhub.com/dashboard/tokens"
     },
     "questions": [
+      {
+        "key": "reposId",
+        "label": "Add repo Id",
+        "help": "Notify each time a new message from the channels listed bellow arrives",
+        "supportUrl": "https://app.zenhub.com/select-organization",
+        "required": true,
+        "placeholder": "general",
+        "order": 1,
+        "controlType": "textbox",
+        "isArray": true
+      },
       {
         "key": "color",
         "label": "Choose the color of the reminder",

@@ -10,10 +10,9 @@ const serviceUrlEnterprise = 'https://<zenhub_enterprise_host>/'
 class ZenHub extends q.DesktopApp {
   constructor() {
     super();
-    // run every 1 min
-    this.pollingInterval = 1 * 60 * 1000;
+    // run every 30 sec
+    this.pollingInterval = 30 * 1000;
   }
-
 
   async applyConfig() {
     this.serviceHeaders = {
@@ -30,20 +29,11 @@ class ZenHub extends q.DesktopApp {
       json: true
     }).then((body) => {
 
-      // Get initial number of issues
-      // logger.info("body "+ JSON.stringify(body));
-      //
+      // Get initial number of issues on each pipelines in array shape
+      
       for (let pipeline of body.pipelines) {
-        // logger.info("pipeline "+ JSON.stringify(pipeline.issues));
-        // logger.info("LENGTH "+ Object.keys(pipeline.issues).length);
-
-        // Add initial number of issues in an array
         this.categories[pipeline.name] = Object.keys(pipeline.issues).length;
-
-        //logger.info("pipeline issues lenght ", pipeline.issues.lenght());
       }
-
-      // logger.info("This is categories: " + JSON.stringify(this.categories));
 
       return null;
 
@@ -57,37 +47,6 @@ class ZenHub extends q.DesktopApp {
       });
   }
 
-  // Test if it is possible to get the workspace name and projectID automaticaly with the API
-  // Instead of enter the field
-
-  /**
-  * Loads the list of workspace from the ZenHub API
-  */
-  async  loadRepos() {
-    logger.info(`Loading workspaces`);
-    const options = {
-      uri: `https://api.zenhub.io/v1/graphql`,
-      headers: this.serviceHeaders,
-      json: true
-    }
-
-    return request.get(options);
-  }
-
-  /**
-   * Called from the Das Keyboard Q software to retrieve the options to display for
-   * the user inputs
-   * @param {} fieldId 
-   * @param {*} search 
-   */
-  async options(fieldId, search) {
-    return this.loadRepos().then(body => {
-      return processReposResponse(body);
-    }).catch(error => {
-      logger.error(`Caught error when loading options: ${error}`);
-    });
-  }
-
   async run() {
     return request.get({
       url: serviceUrl + this.config.reposId + '/board',
@@ -98,30 +57,25 @@ class ZenHub extends q.DesktopApp {
       let message = [];
       let signal = null;
 
-
       for (let pipeline of body.pipelines) {
-
-        // logger.info(`pipeline in run(): ` + JSON.stringify(pipeline));
-
-        // Test if the number of issues is different
-        if (this.categories[pipeline.name] != Object.keys(pipeline.issues).length) {
-          // Numbers need to be the same
-          this.categories[pipeline.name] = Object.keys(pipeline.issues).length
+        // Test if an issue has been added
+        if (this.categories[pipeline.name] < Object.keys(pipeline.issues).length) {
           // Need to send a signal
           triggered = true;
           // Update signal's message
-          message.push("Something happened on" + pipeline.name);
+          message.push(`New issue added on ${pipeline.name}`);
         }
-
+        // Update the number of issues into the pipeline
+        this.categories[pipeline.name] = Object.keys(pipeline.issues).length;
       }
 
       if (triggered) {
         signal = new q.Signal({
           points: [[new q.Point(this.config.color, this.config.effect)]],
           name: "ZenHub",
-          message: message.join('<br>'),
+          message: message.join("<br>"),
           link: {
-            url: 'https://www.zenhub.com/checkpoints',
+            url: 'https://app.zenhub.com/',
             label: 'Show in ZenHub',
           }
         });

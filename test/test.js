@@ -1,9 +1,9 @@
 const assert = require('assert');
 const {
-  QMontastic
+  ZenHub
 } = require('../index');
 
-describe('QMontastic', function () {
+describe('ZenHub', function () {
 
   describe('#run()', function () {
     it('runs normally', async function () {
@@ -21,7 +21,7 @@ describe('QMontastic', function () {
     it('returns an error when the API fails', async function () {
       return buildApp({
         authorization: {
-          apiKey: 'mickey mouse',
+          apiKey: '<your-api-key>',
         }
       }).then(async app => {
         return app.run().then((signal) => {
@@ -38,12 +38,12 @@ describe('QMontastic', function () {
 
 const defaultConfig = Object.freeze({
   authorization: {
-    apiKey: '8f652e62a922ca351521ea0b89199de1067d3204'
+    apiKey: '<your-api-key>'
   }
 });
 
 async function buildApp(config) {
-  let app = new QMontastic();
+  let app = new ZenHub();
 
   // set up the test with a test account's API Key
   return app.processConfig(config || defaultConfig).then(() => {

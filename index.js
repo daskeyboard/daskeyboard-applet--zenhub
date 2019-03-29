@@ -12,6 +12,8 @@ class ZenHub extends q.DesktopApp {
     super();
     // run every 20 sec
     this.pollingInterval = 20 * 1000;
+    // For checking plural or singular
+    this.issue ="";
   }
 
   async applyConfig() {
@@ -30,7 +32,6 @@ class ZenHub extends q.DesktopApp {
     }).then((body) => {
 
       // Get initial number of issues on each pipelines in array shape
-      
       for (let pipeline of body.pipelines) {
         this.categories[pipeline.name] = Object.keys(pipeline.issues).length;
       }
@@ -56,14 +57,19 @@ class ZenHub extends q.DesktopApp {
       let triggered = false;
       let message = [];
       let signal = null;
+      this.issue = "issue";
 
       for (let pipeline of body.pipelines) {
         // Test if an issue has been added
         if (this.categories[pipeline.name] < Object.keys(pipeline.issues).length) {
           // Need to send a signal
           triggered = true;
+          // Check if there are several issues
+          if( (this.categories[pipeline.name]+1) < Object.keys(pipeline.issues).length) {
+            this.issue = "issues";
+          }
           // Update signal's message
-          message.push(`New issue added on ${pipeline.name}`);
+          message.push(`New ${this.issue} added on ${pipeline.name}`);
         }
         // Update the number of issues into the pipeline
         this.categories[pipeline.name] = Object.keys(pipeline.issues).length;

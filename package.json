@@ -49,7 +49,7 @@
       {
         "key": "reposId",
         "label": "Add a repo Id",
-        "help": "To find out the ID of your repository, copy it from the end of the URL of the Board",
+        "help": "To find out the ID of your repository, copy it from the end of the URL of the Board. e.g: https://app.zenhub.com/<workspace>/boards?repos=<YOUR_REPO_ID>",
         "supportUrl": "https://app.zenhub.com/select-organization",
         "required": true,
         "placeholder": "e.g: 745269657",

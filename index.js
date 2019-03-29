@@ -10,8 +10,8 @@ const serviceUrlEnterprise = 'https://<zenhub_enterprise_host>/'
 class ZenHub extends q.DesktopApp {
   constructor() {
     super();
-    // run every 30 sec
-    this.pollingInterval = 30 * 1000;
+    // run every 20 sec
+    this.pollingInterval = 20 * 1000;
   }
 
   async applyConfig() {

@@ -1,7 +1,7 @@
 {
   "name": "daskeyboard-applet--zenhub",
   "displayName": "ZenHub",
-  "publisher": "Metadot Corporation",
+  "publisher": "Das Keyboard",
   "version": "1.0.6",
   "officialProductName": "ZenHub",
   "appUrl": "https://zenhub.com",
@@ -48,17 +48,17 @@
     "questions": [
       {
         "key": "reposId",
-        "label": "Add repo Id",
-        "help": "Notify each time a new message from the channels listed bellow arrives",
+        "label": "Add a repo Id",
+        "help": "To find out the ID of your repository, copy it from the end of the URL of the Board",
         "supportUrl": "https://app.zenhub.com/select-organization",
         "required": true,
-        "placeholder": "general",
+        "placeholder": "e.g: 745269657",
         "order": 1,
         "controlType": "textbox"
       },
       {
         "key": "color",
-        "label": "Choose the color of the reminder",
+        "label": "Choose the color of the rmessageminder",
         "help": "",
         "required": true,
         "order": 1,

@@ -5,7 +5,7 @@
   "version": "1.0.6",
   "officialProductName": "ZenHub",
   "appUrl": "https://zenhub.com",
-  "description": "Get a notification when one of your site goes down.",
+  "description": "Displays board updates.",
   "longDescription": "Get ZenHub alerts directly on a Das Keyboard Q keyboard. Requires a ZenHub account.",
   "icon": "assets/icon.png",
   "image": "assets/image-missing.png",

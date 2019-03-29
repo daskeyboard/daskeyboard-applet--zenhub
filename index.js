@@ -69,7 +69,7 @@ class ZenHub extends q.DesktopApp {
             this.issue = "issues";
           }
           // Update signal's message
-          message.push(`New ${this.issue} added on ${pipeline.name}`);
+          message.push(`New ${this.issue} added on ${pipeline.name}.`);
         }
         // Update the number of issues into the pipeline
         this.categories[pipeline.name] = Object.keys(pipeline.issues).length;

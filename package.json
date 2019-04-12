@@ -58,11 +58,11 @@
       },
       {
         "key": "color",
-        "label": "Choose the color of the rmessageminder",
+        "label": "Choose the color of the reminder",
         "help": "",
         "required": true,
         "order": 1,
-        "value": "#FFFF00",
+        "value": "#5e5fb9",
         "controlType": "color"
       },
       {

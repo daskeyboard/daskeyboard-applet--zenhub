@@ -49,6 +49,7 @@ class ZenHub extends q.DesktopApp {
   }
 
   async run() {
+    logger.info("ZenHub running.");
     return request.get({
       url: serviceUrl + this.config.reposId + '/board',
       headers: this.serviceHeaders,
@@ -62,6 +63,7 @@ class ZenHub extends q.DesktopApp {
       for (let pipeline of body.pipelines) {
         // Test if an issue has been added
         if (this.categories[pipeline.name] < Object.keys(pipeline.issues).length) {
+          logger.info("Got update.");
           // Need to send a signal
           triggered = true;
           // Check if there are several issues

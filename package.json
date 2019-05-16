@@ -2,7 +2,7 @@
   "name": "daskeyboard-applet--zenhub",
   "displayName": "ZenHub",
   "publisher": "Das Keyboard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "officialProductName": "ZenHub",
   "appUrl": "https://zenhub.com",
   "description": "Displays board updates.",

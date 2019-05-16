@@ -96,13 +96,15 @@ class ZenHub extends q.DesktopApp {
         logger.error(
           `Got error sending request to service: ${JSON.stringify(error)}`);
         if(`${error.message}`.includes("getaddrinfo")){
-          return q.Signal.error(
-            'The ZenHub service returned an error. <b>Please check your internet connection</b>.'
-          );
+          // Do not send signal when getting internet connection error
+          // return q.Signal.error(
+          //   'The ZenHub service returned an error. <b>Please check your internet connection</b>.'
+          // );
+        }else{
+          return q.Signal.error([
+            'The ZenHub service returned an error. <b>Please check your API key and account</b>.',
+            `Detail: ${error.message}`]);
         }
-        return q.Signal.error([
-        'The ZenHub service returned an error. <b>Please check your API key and account</b>.',
-        `Detail: ${error.message}`]);
       });
   }
 
